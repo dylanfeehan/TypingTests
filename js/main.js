@@ -68,8 +68,9 @@ const words = [
 
 // Initialize Game
 function init() {
+
   // Show number of seconds in UI
-  seconds.innerHTML = time;
+  seconds.innerHTML = currentLevel;
   // Load word from array
   showWord(words);
   // Start matching on word input
