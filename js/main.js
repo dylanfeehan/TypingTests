@@ -1,29 +1,22 @@
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-
 window.addEventListener('load', init);
 
 // Globals
 
 //Available Levels
 const levels = {
-  easy: 5,
+  easy: 10,
   medium: 3, 
-  hard: 2,
-  veryHard: 1
+  hard: 2
 }
 //to change level: 
-const currentLevel = levels.veryHard;
+let currentLevel = levels.easy;
+//==========================================================================================
 
-// Available Levels
-// To change level
+
+
+
+//==========================================================================================
+
 
 let time = currentLevel;
 let score = 0;
@@ -37,6 +30,7 @@ const timeDisplay = document.querySelector('#time');
 const message = document.querySelector('#message');
 const seconds = document.querySelector('#seconds');
 const highscoreDisplay = document.querySelector('#highscore');
+const displayLevel = document.querySelector('#display-level');
 
 const words = [
   'hat',
@@ -66,6 +60,18 @@ const words = [
   'definition'
 ];
 
+let temp = levels.easy;
+
+function setLevel(level) {
+  temp = level;
+  isPlaying = true;
+  currentLevel = level;
+  displayLevel.innerHTML = "Setting level to " + currentLevel;
+  startMatch();
+
+}
+
+
 // Initialize Game
 function init() {
 
@@ -75,6 +81,7 @@ function init() {
   showWord(words);
   // Start matching on word input
   wordInput.addEventListener('input', startMatch);
+  
   // Call countdown every second
   setInterval(countdown, 1000);
   // Check game status
@@ -84,14 +91,17 @@ function init() {
 // Start match
 function startMatch() {
   if (matchWords()) {
+    
     isPlaying = true;
     time = currentLevel + 1;
     showWord(words);
     wordInput.value = '';
     score++;
+    currentLevel = temp;
+    displayLevel.innerHTML = "Current Level is currently " + currentLevel;
   }
-  
 
+  
   // If score is -1, display 0
   if (score === -1) {
     scoreDisplay.innerHTML = 0;
