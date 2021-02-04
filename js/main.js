@@ -21,8 +21,10 @@ let currentLevel = levels.easy;
 let time = currentLevel;
 let score = 0;
 let isPlaying;
-
+let highscore;
+let tempScoreStorage = 0;
 // DOM Elements
+
 const wordInput = document.querySelector('#word-input');
 const currentWord = document.querySelector('#current-word');
 const scoreDisplay = document.querySelector('#score');
@@ -33,41 +35,56 @@ const highscoreDisplay = document.querySelector('#highscore');
 const displayLevel = document.querySelector('#display-level');
 
 const words = [
-  'hat',
-  'river',
-  'lucky',
-  'statue',
-  'generate',
-  'stubborn',
-  'cocktail',
-  'runaway',
-  'joke',
-  'developer',
-  'establishment',
-  'hero',
-  'javascript',
-  'nutrition',
-  'revolver',
-  'echo',
-  'siblings',
-  'investigate',
-  'horrendous',
-  'symptom',
-  'laughter',
-  'magic',
-  'master',
-  'space',
-  'definition'
+  'if',//
+  'elif',
+  'else',//
+  'function',//
+  'int',//
+  'double',//
+  'boolean',
+  'String',//
+  'for',//
+  'while',//
+  'break',//
+  'case',//
+  'javascript',//
+  'python',//
+  'java',
+  'i++',//
+  'HTML',
+  'CSS',//
+  'return',//
+  'this',
+  '{}', //
+  '[]',
+  'let', //
+  'const',//
+  '()'
 ];
 
 let temp = levels.easy;
 
 function setLevel(level) {
+  sessionStorage['highscore'] = 0;
+  highscoreDisplay.innerHTML = 0;
   temp = level;
   isPlaying = true;
   currentLevel = level;
-  displayLevel.innerHTML = "Setting level to " + currentLevel;
+  if (level === 1) {
+    displayLevel.innerHTML = "Setting difficulty to hard";
+  } else if (level === 5){
+    displayLevel.innerHTML = "Setting difficulty to medium";
+  } else {
+    displayLevel.innerHTML = "Setting difficulty to easy.. coward";
+  }
+  //displayLevel.innerHTML = "Setting level to " + currentLevel;
+  score = -1;
+  highscore = 0;
+  seconds.innerHTML = currentLevel;
   startMatch();
+  // score = -1;
+  // highscore = 0;
+  // seconds.innerHTML = currentLevel;
 
 }
 
@@ -90,18 +107,36 @@ function init() {
 
 // Start match
 function startMatch() {
+
+    
   if (matchWords()) {
     
     isPlaying = true;
     time = currentLevel + 1;
     showWord(words);
+    
     wordInput.value = '';
     score++;
     currentLevel = temp;
-    displayLevel.innerHTML = "Current Level is currently " + currentLevel;
+    if (currentLevel === 1) {
+      displayLevel.innerHTML = "Playing Hard";
+    } else if (currentLevel === 5){
+      displayLevel.innerHTML = "Playing Medium";
+    } else {
+      displayLevel.innerHTML = "Playing Easy";
+    }
   }
 
-  
+  if (typeof sessionStorage['highscore'] === 'undefined' || score > sessionStorage['highscore']) {
+    sessionStorage['highscore'] = score;
+  } else {
+    sessionStorage['highscore'] = sessionStorage['highscore'];
+  }
+
+  if (sessionStorage['highscore'] >= 0) {
+    highscoreDisplay.innerHTML = sessionStorage['highscore'];
+  }
+
   // If score is -1, display 0
   if (score === -1) {
     scoreDisplay.innerHTML = 0;
@@ -127,6 +162,8 @@ function showWord(words) {
   const randIndex = Math.floor(Math.random() * words.length);
   // Output random word
   currentWord.innerHTML = words[randIndex];
+  console.log(words[randIndex]);
+
 }
 
 // Countdown timer
@@ -139,6 +176,7 @@ function countdown() {
     // Game is over
     isPlaying = false;
   }
+  
   // Show time
   timeDisplay.innerHTML = time;
 }
@@ -147,6 +185,12 @@ function countdown() {
 function checkStatus() {
   if (!isPlaying && time === 0) {
     message.innerHTML = 'Game Over!!!';
+    
     score = -1;
   }
 }
+
+// console.log(`Score: ${score}, high score: ${highscore}`)
+// if (score > highscore){
+//     highscoreDisplay.innerHTML = score;
+// }
