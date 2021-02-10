@@ -1,30 +1,23 @@
-window.addEventListener('load', init);
+window.addEventListener('load', init); // runs the init function upon loading of the window
 
 // Globals
 
 //Available Levels
 const levels = {
   easy: 10,
-  medium: 3, 
+  medium: 3,  
   hard: 2
 }
-//to change level: 
-let currentLevel = levels.easy;
-//==========================================================================================
+//Default level is easy
+let currentLevel = levels.easy; 
 
 
-
-
-//==========================================================================================
-
-
-let time = currentLevel;
-let score = 0;
+let time = currentLevel; // time is continuously decremented
+let score = 0; 
 let isPlaying;
 let highscore;
-let tempScoreStorage = 0;
-// DOM Elements
 
+// DOM Elements
 const wordInput = document.querySelector('#word-input');
 const currentWord = document.querySelector('#current-word');
 const scoreDisplay = document.querySelector('#score');
@@ -34,58 +27,70 @@ const seconds = document.querySelector('#seconds');
 const highscoreDisplay = document.querySelector('#highscore');
 const displayLevel = document.querySelector('#display-level');
 
+
+let timerStart = 150;
+let timerEnd = 160;
+let wpm = 100;
+let secondsPassed = 100;
+let isPaused = false;
+let counterPaused = false;
+
+
+
 const words = [
-  'if',//
+  'if',
   'elif',
-  'else',//
-  'function',//
-  'int',//
-  'double',//
+  'else',
+  'function',
+  'int',
+  'double',
   'boolean',
-  'String',//
-  'for',//
-  'while',//
-  'break',//
-  'case',//
-  'javascript',//
-  'python',//
+  'String',
+  'for',
+  'while',
+  'break',
+  'case',
+  'javascript',
+  'python',
   'java',
-  'i++',//
+  'i++',
   'HTML',
-  'CSS',//
-  'return',//
+  'CSS',
+  'return',
   'this',
-  '{}', //
+  '{}', 
   '[]',
-  'let', //
-  'const',//
+  'let', 
+  'const',
   '()'
 ];
 
-let temp = levels.easy;
 
+//this function happens when a button is pressed: 
 function setLevel(level) {
-  sessionStorage['highscore'] = 0;
-  highscoreDisplay.innerHTML = 0;
-  temp = level;
-  isPlaying = true;
-  currentLevel = level;
-  if (level === 1) {
-    displayLevel.innerHTML = "Setting difficulty to hard";
-  } else if (level === 5){
-    displayLevel.innerHTML = "Setting difficulty to medium";
-  } else {
-    displayLevel.innerHTML = "Setting difficulty to easy.. coward";
-  }
-  //displayLevel.innerHTML = "Setting level to " + currentLevel;
-  score = -1;
-  highscore = 0;
-  seconds.innerHTML = currentLevel;
-  startMatch();
-  // score = -1;
-  // highscore = 0;
-  // seconds.innerHTML = currentLevel;
+  if (currentLevel !== level){
+      currentWord.innerHTML = '';
+      //reset highschore because change in difficulty
+      sessionStorage['highscore'] = 0;
+      highscoreDisplay.innerHTML = 0;
 
+      isPlaying = true;
+      currentLevel = level;  // setting currentLevel to the different level
+
+      //displaying the change in level atop the screen
+      if (level === 1) {
+        displayLevel.innerHTML = "Setting difficulty to hard";
+      } else if (level === 5){
+        displayLevel.innerHTML = "Setting difficulty to medium";
+      } else {
+        displayLevel.innerHTML = "Setting difficulty to easy.. coward";
+      }
+      score = -1; // setting score back to low
+      highscore = 0; //setting highscore back to 0
+      seconds.innerHTML = currentLevel; // changing the display of seconds. 
+      
+      startMatch(); // look more into what this does
+    }
 }
 
 
@@ -103,21 +108,26 @@ function init() {
   setInterval(countdown, 1000);
   // Check game status
   setInterval(checkStatus, 50);
+
 }
 
 // Start match
 function startMatch() {
+  if (score === 0) {
+    timerStart = Date.now();
+  }
 
     
   if (matchWords()) {
-    
+    counterPaused = false;
+    isPaused = false;
     isPlaying = true;
     time = currentLevel + 1;
     showWord(words);
     
     wordInput.value = '';
     score++;
-    currentLevel = temp;
+    
     if (currentLevel === 1) {
       displayLevel.innerHTML = "Playing Hard";
     } else if (currentLevel === 5){
@@ -172,9 +182,18 @@ function countdown() {
   if (time > 0) {
     // Decrement
     time--;
-  } else if (time === 0) {
+  } else if (time === 0 && counterPaused == false) {
     // Game is over
+    timerEnd = Date.now();
     isPlaying = false;
+    isPaused = true;
+    counterPaused = true; ///
+    
+    secondsPassed = (timerEnd - timerStart) / 1000;
+    wpm = score / (secondsPassed / 60);
+    
+    
+
   }
   
   // Show time
@@ -183,10 +202,22 @@ function countdown() {
 
 // Check game status
 function checkStatus() {
-  if (!isPlaying && time === 0) {
-    message.innerHTML = 'Game Over!!!';
-    
-    score = -1;
+  if (!isPaused) {
+    if (!isPlaying && time === 0) {
+
+      message.innerHTML = 'Game Over!!!';
+  
+      
+      message.innerHTML = 'Game Over!!! WPM: ';
+      
+      score = -1;
+    }
+  }
+  if(isPaused) { // aka ELSE {}
+
+      message.innerHTML = `WPM: ${wpm.toFixed(1)}`;  
+      score = -1;
+
   }
 }
 
